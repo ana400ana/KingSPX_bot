@@ -57,7 +57,7 @@ async def member_update(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except Exception:
             pass
 
-def main():
+async def main():
     threading.Thread(target=run_web, daemon=True).start()
 
     app = Application.builder().token(TOKEN).build()
@@ -65,7 +65,11 @@ def main():
     app.add_handler(CommandHandler("id", id_command))
     app.add_handler(ChatMemberHandler(member_update, ChatMemberHandler.CHAT_MEMBER))
 
-    app.run_polling(allowed_updates=["message", "chat_member"])
-
+    await app.initialize()
+await app.start()
+await app.updater.start_polling(
+    allowed_updates=["message", "chat_member"]
+)
+await asyncio.Event().wait()
 if __name__ == "__main__":
-    main()
+  asyncio.run(main())  
